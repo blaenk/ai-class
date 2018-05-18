@@ -1,0 +1,32 @@
+While implementing minimax I stumbled on various issues that were not mentioned in Authors' "Hints" section but which may speedup development so I decided to extend it a bit. Might be helpful for those who are slow to start due to limited python knowledge.
+
+From reading a forum I see that people usually struggle with this Question because their implementation is too complex. If you do it according to pseudocode you'll end up with just 3 functions, 2 loops and few ifs. Don't overdo otherwise you'll have a lot of pain with debugging.
+
+The pseudocode for minimax is located in Lecture 6 Part 3 at 9:10-11:48.
+
+You may go straightforward and implement 3 methods as suggested in Lecture (in addition to getAction()). Basically they will call each other in recursion in DFS fashion. (Note. If the methods are forward declared the code won't compile. I did it by adding "self." to the method calls although I'd be pleased to hear suggestion of how to do it in a proper way.)
+
+You won't need any special treatment for two min agents - if you implement value() method properly (i.e. as suggested in pseudocode) it will do all the trick.
+
+Call respective min and max methods for all Agents (not actions!) in order. Start from 0 which is Pacman and proceed until getNumAgents(). Only after you went through all Agents you descend to the next ply (layer) and start over.
+
+Don't confuse the previous statement with going through all actions (instead of all Agents!) before descending to next layer as this will do BFS (instead of DFS).
+
+Pseudocode suggests to return only value but you need action to take as well. You may do it by returning tuple (action, value).
+
+The bottom of the search tree is reached when you reach the predefined depth but you may hit the leaf node before you reach the bottom of the tree! In this case getLegalActions(agent) returns empty list, be careful with that.
+
+Check values with minimaxClassic layout before submitting to grader.
+
+
+
+Add 2 more parameters - agentIndex and currDepth for val(), maxVal() and minVal(). So at the end the signature of each of them should include state, agentIndex, currDepth. Kindly note that neither agentIndex nor currDepth is a global/class variable. Instead they are just local variables of respective functions.
+In val(), add another condition to terminal state check which is currDepth == self.depth
+In val(), if agentIndex reaches the games number of agents then reset agentIndex to 0 and increase currDepth by 1
+In val(), change the indicator that differentiates calling maxVal() and minVal() with agentIndex. So if agentIndex is 0 then call maxVal() else minVal(). Remember to pass agentIndex and currDepth to each of them
+In maxVal(), pass additional parameters while invoking val(). They should be "agentIndex + 1" and currDepth. Store the value returned in nextVal. If nextVal is greater than v then replace value in v with nextVal. If also, currDepth is 0 then save the chosen action in self.bestPacmanAction. This is because we are interested in the action of the pacman in the "initial node" only. Note that bestPacmanAction is a global/class variable here.
+In minVal(), pass additional parameters while invoking val(). They should be "agentIndex + 1" and currDepth. No further changes required here as we are not interested in the action of ghosts
+Note that all the above 3 functions will return only the value or score as suggested in lecture slide. Some students return tuples with both value and action. But since we are storing action in a class variable ... tuple is not required and might complicate the code and debugging especially for those who are new to Python (like me)
+Now we have the base functions ready. The key function that needs to be invoked from else where is val(). In getActions(), invoke val() by passing 3 parameters - gameState, agentIndex as 0, currDepth as 0.
+We need to return action that pacman should take and not the score. So in getActions(), after invoking val(), return self.bestPacmanAction.
+Execute the program and it should positively work :-)
